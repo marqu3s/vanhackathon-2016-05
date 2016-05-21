@@ -11,7 +11,7 @@
 namespace api\controllers;
 
 use yii;
-use common\models\User;
+use api\modules\v1\models\Player;
 
 /**
  * Class LoginController
@@ -54,25 +54,25 @@ class LoginController extends MastermindController
             }
 
             # Create a new user if not already registered
-            $user = User::findByEmail($email);
-            if ($user === null) {
-                /** @var User $user */
-                $user = new User();
-                $user->username = Yii::$app->request->post('email');
-                $user->email = Yii::$app->request->post('email');
-                $user->name = Yii::$app->request->post('name');
-                $user->access_token = Yii::$app->getSecurity()->generateRandomString();
-                $user->save();
+            $player = Player::findByEmail($email);
+            if ($player === null) {
+                /** @var Player $player */
+                $player = new Player();
+                $player->username = Yii::$app->request->post('email');
+                $player->email = Yii::$app->request->post('email');
+                $player->name = Yii::$app->request->post('name');
+                $player->access_token = Yii::$app->getSecurity()->generateRandomString();
+                $player->save();
 
-                return ['token' => $user->access_token];
+                return ['token' => $player->access_token];
             } else {
-                return ['token' => $user->access_token];
+                return ['token' => $player->access_token];
             }
         } else {
             # Validate the token
-            $user = User::findIdentityByAccessToken($token);
-            if ($user !== null) {
-                return ['token' => $user->access_token];
+            $player = Player::findIdentityByAccessToken($token);
+            if ($player !== null) {
+                return ['token' => $player->access_token];
             } else {
                 return $this->returnError('Invalid access token.');
             }

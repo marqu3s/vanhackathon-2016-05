@@ -8,19 +8,24 @@ use yii\web\IdentityInterface;
 
 /**
  * Player model
+ * This is the model class for table "player".
  *
  * @property integer $id
  * @property string $username
  * @property string $name
+ * @property string $auth_key
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $access_token
  * @property string $email
- * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ *
+ * @property Game[] $games
+ * @property Match[] $matches
+ * @property PlayerGuessHistory[] $playerGuessHistories
  */
 class Player extends ActiveRecord implements IdentityInterface
 {
@@ -198,5 +203,44 @@ class Player extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+
+
+
+    ### MODEL RELATIONS ###
+
+    /**
+     * @inheritdoc
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGames()
+    {
+       return $this->hasMany(Game::className(), ['id_player_owner' => 'id']);
+    }
+
+    /**
+     * @inheritdoc
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMatches($active = true)
+    {
+        
+        $query = $this->hasMany(Match::className(), ['id_player' => 'id']);
+        //if ($active) $query->active();
+
+        return $query;
+    }
+
+    /**
+     * @inheritdoc
+     * @param integer $idGame The ID of a game to get the history from.
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlayerGuessHistories($idGame)
+    {
+        return $this->hasMany(PlayerGuessHistory::className(), ['id_player' => 'id'])
+            ->where(['id_game' => $idGame])
+            ->orderBy(['guessed_at' => SORT_ASC]);
     }
 }

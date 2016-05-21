@@ -10,11 +10,19 @@
 
 namespace api\modules\v1\controllers;
 
+use api\modules\v1\models\Match;
 use yii;
 use yii\rest\ActiveController;
 use api\controllers\MastermindController;
 use api\modules\v1\models\Player;
 
+/**
+ * Class PlayerController
+ * 
+ * Endpoits for managing players.
+ *
+ * @package api\modules\v1\controllers
+ */
 class PlayerController extends ActiveController
 {
     public $modelClass = 'api\modules\v1\models\Player';
@@ -32,5 +40,38 @@ class PlayerController extends ActiveController
         } else {
             return $player;
         }
+    }
+
+    /**
+     * Returns all the matches the player had joined and that are active.
+     * @return Match[]
+     */
+    public function actionActiveMatches()
+    {
+        $player = self::getPlayer();
+
+        return $player->getMatches()->active()->all();
+    }
+
+    /**
+     * Returns all the matches the player had joined and that are inactive (finished).
+     * @return Match[]
+     */
+    public function actionInactiveMatches()
+    {
+        $player = self::getPlayer();
+
+        return $player->getMatches()->inactive()->all();
+    }
+
+    /**
+     * Returns all the matches the player had joined.
+     * @return Match[]
+     */
+    public function actionMatches()
+    {
+        $player = self::getPlayer();
+
+        return $player->getMatches()->all();
     }
 }

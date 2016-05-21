@@ -35,7 +35,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                ### LOGIN ###
+                ### LOGIN ENDPOINT ###
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'login',
@@ -45,26 +45,40 @@ return [
                     ]
                 ],
 
-                ### GAMES ###
+                ### GAMES ENDPOINT ###
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/game'],
                     'pluralize' => false,
-                    //'only' => ['index', 'create']
                     'patterns' => [
                         'GET' => 'index',
                         'POST new' => 'new',
                         'POST join' => 'join',
-                        'POST start' => 'start',
                         'POST leave' => 'leave',
+                    ]
+                ],
+
+                ### MATCHES ENDPOINT ###
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['v1/match'],
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'POST start' => 'start',
                         'POST guess' => 'guess',
                     ]
                 ],
 
-                ### USERS/PLAYERS ###
+                ### PLAYERS ENDPOINT ###
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/player']
+                    'controller' => ['v1/player'],
+                    'extraPatterns' => [
+                        'GET matches' => 'matches',
+                        'GET active-matches' => 'active-matches',
+                        'GET inactive-matches' => 'inactive-matches',
+                    ]
                 ],
             ],
         ],
