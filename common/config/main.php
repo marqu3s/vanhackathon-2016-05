@@ -21,7 +21,8 @@ return [
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=10.70.20.188;dbname=vanhackathon-2016-05-joao-marques',
+            'dsn' => 'mysql:host=172.17.0.2;dbname=vanhackathon-2016-05-joao-marques',
+            //'dsn' => 'mysql:host=10.70.20.188;dbname=vanhackathon-2016-05-joao-marques',
             'username' => 'vanhack',
             'password' => 'vanhack2016',
             'charset' => 'utf8',

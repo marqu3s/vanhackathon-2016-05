@@ -13,7 +13,7 @@ Inside of these 2 folders the most important part of code are inside the subfold
 The rest of the folders are mostly framework folders. Here is an overview of the project folder:
 
 
-DIRECTORY STRUCTURE
+Directory Structure
 -------------------
 
 ```
@@ -49,9 +49,178 @@ vendor/                  contains dependent 3rd-party packages
 ```
 
 
-SETUP INSTRUCTIONS
+Setup Instructions
 ------------------
 
-This projects uses a MySQL database. The dump is included in the root folder - database_mysql.sql
+This projects uses a MySQL database. The dump is included in the root folder - `database_mysql.sql`
 
-After importing the dump, adjust the components['db'] configuration in common/config/main-local.php accordingly.
+After importing the dump, adjust the `components['db']` configuration in `common/config/main.php` accordingly.
+
+Set document roots of your web server:
+
+* for api `/path/to/project/api/web/` and using a local URL of your choice, like http://api.mastermind.dev/
+* for frontend `/path/to/project/frontend/web/` and using a local URL of your choice, like http://mastermind.dev/
+
+For Apache it could be the following:
+
+```
+<VirtualHost *:80>
+   ServerName mastermind.dev
+   DocumentRoot "/path/to/project/frontend/web/"
+
+   <Directory "/path/to/project/frontend/web/">
+       # use mod_rewrite for pretty URL support
+       RewriteEngine on
+       # If a directory or a file exists, use the request directly
+       RewriteCond %{REQUEST_FILENAME} !-f
+       RewriteCond %{REQUEST_FILENAME} !-d
+       # Otherwise forward the request to index.php
+       RewriteRule . index.php
+
+       # use index.php as index file
+       DirectoryIndex index.php
+
+       # ...other settings...
+   </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+   ServerName api.mastermind.dev
+   DocumentRoot "/path/to/project/api/web/"
+
+   <Directory "/path/to/project/api/web/">
+       # use mod_rewrite for pretty URL support
+       RewriteEngine on
+       # If a directory or a file exists, use the request directly
+       RewriteCond %{REQUEST_FILENAME} !-f
+       RewriteCond %{REQUEST_FILENAME} !-d
+       # Otherwise forward the request to index.php
+       RewriteRule . index.php
+
+       # use index.php as index file
+       DirectoryIndex index.php
+
+       # ...other settings...
+   </Directory>
+</VirtualHost>
+```
+
+For nginx:
+
+```
+server {
+   charset utf-8;
+   client_max_body_size 128M;
+
+   listen 80; ## listen for ipv4
+   #listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+
+   server_name mastermind.dev;
+   root        /path/to/project/frontend/web/;
+   index       index.php;
+
+   access_log  /path/to/project/log/frontend-access.log;
+   error_log   /path/to/project/log/frontend-error.log;
+
+   location / {
+       # Redirect everything that isn't a real file to index.php
+       try_files $uri $uri/ /index.php$is_args$args;
+   }
+
+   # uncomment to avoid processing of calls to non-existing static files by Yii
+   #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+   #    try_files $uri =404;
+   #}
+   #error_page 404 /404.html;
+
+   location ~ \.php$ {
+       include fastcgi_params;
+       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+       fastcgi_pass   127.0.0.1:9000;
+       #fastcgi_pass unix:/var/run/php5-fpm.sock;
+       try_files $uri =404;
+   }
+
+   location ~ /\.(ht|svn|git) {
+       deny all;
+   }
+}
+
+server {
+   charset utf-8;
+   client_max_body_size 128M;
+
+   listen 80; ## listen for ipv4
+   #listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+
+   server_name api.mastermind.dev;
+   root        /path/to/project/api/web/;
+   index       index.php;
+
+   access_log  /path/to/project/log/api-access.log;
+   error_log   /path/to/project/log/api-error.log;
+
+   location / {
+       # Redirect everything that isn't a real file to index.php
+       try_files $uri $uri/ /index.php$is_args$args;
+   }
+
+   # uncomment to avoid processing of calls to non-existing static files by Yii
+   #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+   #    try_files $uri =404;
+   #}
+   #error_page 404 /404.html;
+
+   location ~ \.php$ {
+       include fastcgi_params;
+       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+       fastcgi_pass   127.0.0.1:9000;
+       #fastcgi_pass unix:/var/run/php5-fpm.sock;
+       try_files $uri =404;
+   }
+
+   location ~ /\.(ht|svn|git) {
+       deny all;
+   }
+}
+```
+
+Adjust the logs location to your needs.
+
+Don't forget to change the hosts file to point the domain to your server.
+                
+* Windows: c:\Windows\System32\Drivers\etc\hosts
+* Linux: /etc/hosts
+                
+Add the following lines:
+
+* 127.0.0.1     mastermind.dev
+* 127.0.0.1     api.mastermind.dev
+
+
+
+Challenge 1: API for playing Mastermind Game
+--------------------------------------------
+
+The database and the API were built from the begining having multiplayer games in mind.
+
+A documentation is available at Apiary so you can have an overview of its endpoints and supported requests: http://docs.joaomarquesmastermind.apiary.io
+
+A DHC config file is also included on the root folder: `vanhackathon.json`. DHC is a Google Chrome Extension to test REST APIs.
+You can install it and import the config file. It will create a project named `VanHackathon` with some API resquests examples used during the development.
+
+
+Challenge 2: A frontend for playing Mastermind Game with the API from challenge 1
+---------------------------------------------------------------------------------
+
+The real challenge here for me (as a developer, not a designer) is to don't stress the server with so many requests.
+
+That's why I will try my best to build a client using websockets insteat of firing a lot of ajax requests to the server.
+
+I'm not used to websockets but that's what I'm here for: LEARN NEW STUFF!
+
+I decided to focus on making the websockets work. Maybe it will not look so good but hey, thats a designer job!
+I know how to put thinks together with HTML5, CSS3, Javascript, jQuery, Bootstrap because those are the things I know but I' not that good in creating layouts.
+I know how to bring one to life!
+
+The result you can see by accessing the address http://mastermind.dev (or whatever you decided to use) on your browser.
