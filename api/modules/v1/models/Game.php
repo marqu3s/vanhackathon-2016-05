@@ -19,10 +19,10 @@ use yii\db\ActiveRecord;
  * @property integer $started_at
  * @property integer $ended_at
  *
- * @property Player $idPlayerOwner
- * @property Player $idPlayerWinner
+ * @property Player $owner
+ * @property Player $winner
  * @property Match[] $matches
- * @property Player[] $idPlayers
+ * @property Player[] $players
  */
 class Game extends \yii\db\ActiveRecord
 {
@@ -126,7 +126,7 @@ class Game extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getIdPlayerOwner()
+    public function getOwner()
     {
         return $this->hasOne(Player::className(), ['id' => 'id_player_owner']);
     }
@@ -134,7 +134,7 @@ class Game extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getIdPlayerWinner()
+    public function getWinner()
     {
         return $this->hasOne(Player::className(), ['id' => 'id_player_winner']);
     }
@@ -142,7 +142,7 @@ class Game extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getIdPlayers()
+    public function getPlayers()
     {
         return $this->hasMany(Player::className(), ['id' => 'id_player'])->viaTable('match', ['id_game' => 'id']);
     }
