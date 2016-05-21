@@ -111,9 +111,6 @@ class Match extends ActiveRecord
         $exactMatches = 0;
         $nearMatches = 0;
 
-        $this->num_guesses++;
-        $this->save();
-
         $player = PlayerController::getPlayer();
 
         # Guess code in array format
@@ -122,15 +119,36 @@ class Match extends ActiveRecord
         # Secret code in array format
         $arrSecretCode = explode(',', $this->game->code);
 
-        if (count($arrGuessCode) > count(($arrSecretCode))) {
+        # Validate the size of the guess code and compare to the secret code.
+        if (count($arrGuessCode) != count(($arrSecretCode))) {
             return MastermindController::returnError('This game expects a guess with ' . count($arrSecretCode) . ' color codes.');
         }
+        
+        # Validate the guess code colors
+        $availableColors = $this->game->available_colors;
+        $arrAvailableColors = explode(',', $availableColors);
+        foreach ($arrGuessCode as $color) {
+            if (!in_array($color, $arrAvailableColors)) {
+                return MastermindController::returnError('The color code ' . $color . ' is not available in this game. Available colors are: ' . $availableColors);
+            }
+        }
+        
+        # Has the game already started?
+        if (!$this->game->isStarted()) {
+            return MastermindController::returnError("This game isn't started yet.");
+        }
 
-        # Solved the code?
+        # Has the game already ended?
+        if ($this->game->isEnded()) {
+            return MastermindController::returnError("This game has ended.");
+        }
+
+        # Is the code solved?
         if ($arrGuessCode === $arrSecretCode) {
             $solved = true;
-            $message = 'You won! Congratulations!!!';
-            $exactMatches = count($this->game->code);
+            $message = 'You broke the code! Congratulations!!!';
+            $exactMatches = count($arrSecretCode);
+            $nearMatches = 0;
 
             $this->game->id_player_winner = $player->id;
             $this->game->ended_at = time();
@@ -143,8 +161,9 @@ class Match extends ActiveRecord
             foreach ($arrGuessCode as $i => $colorCode) {
                 if ($arrSecretCode[$i] == $colorCode) {
                     $exactMatches++;
+                    continue;
                 } else {
-                    $nearMatches++;
+                    if (in_array($colorCode, $arrSecretCode)) $nearMatches++;
                 }
             }
 
@@ -152,6 +171,10 @@ class Match extends ActiveRecord
             # This way the play will not know the secret code by inspecting network traffic.
             $this->game->code = "Shhh! It's a secret!";
         }
+
+        # Increment the number of player guesses in this match.
+        $this->num_guesses++;
+        $this->save();
 
         # Save player guess, creating a history of guesses.
         $this->savePlayerGuess($player->id, $guessCode, $exactMatches, $nearMatches);

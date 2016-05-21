@@ -98,22 +98,24 @@ class Game extends \yii\db\ActiveRecord
     }
 
     /**
-     * @param bool $insert
+     * @param bool $insert true if inserting a record in the database.
      * @return bool
      */
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
-            $this->available_colors = implode(',', array_keys($this->_colors));
+            if ($insert) { // only to this when inserting a new game into the database
+                $this->available_colors = implode(',', array_keys($this->_colors));
 
-            # Randomize the order of the colors and set the code for this game.
-            $colors = $this->_colors;
-            $this->shuffle_assoc($colors);
+                # Randomize the order of the colors and set the code for this game.
+                $colors = $this->_colors;
+                $this->shuffle_assoc($colors);
 
 
-            # Generate a secret code that have the size of $thi->secretSize
-            $this->code = array_slice($colors, 0, $this->secretSize);
-            $this->code = implode(',', array_keys($this->code));
+                # Generate a secret code that have the size of $thi->secretSize
+                $this->code = array_slice($colors, 0, $this->secretSize);
+                $this->code = implode(',', array_keys($this->code));
+            }
 
             return true;
         } else {
@@ -151,6 +153,24 @@ class Game extends \yii\db\ActiveRecord
     public function getMatches()
     {
         return $this->hasMany(Match::className(), ['id_game' => 'id']);
+    }
+
+    /**
+     * Check if a game has started.
+     * @return bool true if the game has started.
+     */
+    public function isStarted()
+    {
+        return $this->started_at > 0;
+    }
+
+    /**
+     * Check if a game has ended.
+     * @return bool true if the game has ended.
+     */
+    public function isEnded()
+    {
+        return $this->ended_at > 0;
     }
 
 
