@@ -58,6 +58,8 @@ This projects uses a MySQL database. The dump is included in the root folder - `
 
 After importing the dump, adjust the `components['db']` configuration in `common/config/main.php` accordingly.
 
+Install the composer depencies by running: `composer update` on the root folder.
+
 Set document roots of your web server:
 
 * for api `/path/to/project/api/web/` and using a local URL of your choice, like http://api.mastermind.dev/

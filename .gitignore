@@ -16,7 +16,7 @@ nbproject
 Thumbs.db
 
 # composer vendor dir - normaly not included on the repository but I decided to include it to it easy to the evaluators.
-# /vendor
+/vendor
 
 # composer itself is not needed
 composer.phar
