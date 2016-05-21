@@ -49,14 +49,18 @@ class GameController extends ActiveController
      */
     public function actionNew()
     {
+        $secretSize = (int) Yii::$app->request->post('secret_size');
+        if ($secretSize < Game::MIN_SECRET_SIZE OR $secretSize > Game::MAX_SECRET_SIZE) {
+            return MastermindController::returnError('The secret code size must be between ' . Game::MIN_SECRET_SIZE . ' and ' . Game::MAX_SECRET_SIZE . '.');
+        }
+
         $player = PlayerController::getPlayer();
+
+        # Create a new game and set the player as the owner.
         $game = new Game();
+        $game->secretSize = $secretSize;
         $game->id_player_owner = $player->id;
         $game->save();
-
-        # Remove the generated code before sending a response.
-        # This way the play will not know the secret code by inspecting network traffic.
-        //$game->code = "Shhh! It's a secret!";
 
         # Automaticaly create a match and add the player
         $match = new Match();

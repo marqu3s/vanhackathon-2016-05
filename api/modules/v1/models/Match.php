@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models;
 
+use api\controllers\MastermindController;
 use api\modules\v1\controllers\PlayerController;
 use yii;
 use yii\behaviors\TimestampBehavior;
@@ -120,6 +121,10 @@ class Match extends ActiveRecord
         
         # Secret code in array format
         $arrSecretCode = explode(',', $this->game->code);
+
+        if (count($arrGuessCode) > count(($arrSecretCode))) {
+            return MastermindController::returnError('This game expects a guess with ' . count($arrSecretCode) . ' color codes.');
+        }
 
         # Solved the code?
         if ($arrGuessCode === $arrSecretCode) {

@@ -26,6 +26,11 @@ use yii\db\ActiveRecord;
  */
 class Game extends \yii\db\ActiveRecord
 {
+    CONST MIN_SECRET_SIZE = 2;
+    CONST MAX_SECRET_SIZE = 8;
+
+    public $secretSize = 4;
+
     private $_colors = [
         'R' => 'Red',
         'B' => 'Blue',
@@ -104,7 +109,11 @@ class Game extends \yii\db\ActiveRecord
             # Randomize the order of the colors and set the code for this game.
             $colors = $this->_colors;
             $this->shuffle_assoc($colors);
-            $this->code = implode(',', array_keys($colors));
+
+
+            # Generate a secret code that have the size of $thi->secretSize
+            $this->code = array_slice($colors, 0, $this->secretSize);
+            $this->code = implode(',', array_keys($this->code));
 
             return true;
         } else {
