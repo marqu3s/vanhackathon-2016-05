@@ -1,0 +1,15 @@
+{
+  "name": "VanHackathon",
+  "version": "1.0.0",
+  "description": "Node.js for VanHackathon",
+  "author": "João Marques <joao@jjmf.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "*",
+    "socket.io": "*",
+    "redis": "*"
+  }
+}

@@ -13,9 +13,27 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\web\View;
 
 /**
  * Site controller
+ * 
+ * This is the main controller of the frontend.
+ * This is using websockets and in order to make it work you must have:
+ * - Nodejs installed with the following dependencies: express, socket.io and redis
+ * - Redis installed
+ * 
+ * The nodejs application is in nodejs/server.js file.
+ * There you can configure:
+ * - The nodejs server listening port
+ * - The redis server listening port (for communication between node and redis)
+ * - The redis server host address (for communication between node and redis)
+ * 
+ * The redis configuration for the webserver to comunicate with it is in frontend/config/main.php file.
+ * Look for the  'redis' under the 'components' array.
+ * 
+ * For the clients (browsers) to communicate with the nodejs server (our websocket)
+ * you configure the 'websocketAddress' parameter in frontend/config/params.php file.
  */
 class SiteController extends Controller
 {
@@ -68,13 +86,24 @@ class SiteController extends Controller
 
     /**
      * Displays homepage.
-     *
      * @return mixed
      */
     public function actionIndex()
     {
-        if (Yii::$app->request->post()) {
+        $this->registerWebsocketAddress();
 
+        return $this->render('index');
+    }
+
+    /**
+     * Displays the chat page.
+     * @return mixed
+     */
+    public function actionChat()
+    {
+        $this->registerWebsocketAddress();
+
+        if (Yii::$app->request->post()) {
             $name = Yii::$app->request->post('name');
             $message = Yii::$app->request->post('message');
 
@@ -85,8 +114,34 @@ class SiteController extends Controller
 
         }
 
-        return $this->render('index');
+        return $this->render('chat');
     }
+
+
+    /**
+     * Register a global javascript variable with the address of our websocket server.
+     * This will be used by frontend/web/js/notification.js
+     */
+    private function registerWebsocketAddress()
+    {
+        Yii::$app->view->registerJs('var websocketAddress = ' . Yii::$app->params['websocketAddress'] . ';', View::POS_HEAD);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Logs in a user.

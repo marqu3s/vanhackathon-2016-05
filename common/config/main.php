@@ -14,6 +14,11 @@ return [
                         YII_ENV_DEV ? 'jquery.min.js' : '//ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js',
                     ]
                 ],
+                'yii\bootstrap\BootstrapAsset' => [
+                    'css' => [
+                        '/css/flatly.min.css'
+                    ]
+                ]
             ],
         ],
         'cache' => [

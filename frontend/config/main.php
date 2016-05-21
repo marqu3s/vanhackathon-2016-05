@@ -26,22 +26,18 @@ return [
         ],
         'redis' => [
             'class' => 'yii\redis\Connection',
-            //'hostname' => 'localhost',
-            //'hostname' => '10.70.20.188',
-            'hostname' => '172.17.0.4',
-            'port' => 6379,
+            'hostname' => '172.17.0.4', // Adjust the redis host accordingly
+            'port' => 6379, // Adjust the redis port accordingly
             'database' => 0,
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'api\modules\v1\models\Player',
             'enableAutoLogin' => true,
         ],
     ],

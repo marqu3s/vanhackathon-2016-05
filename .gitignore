@@ -4,6 +4,9 @@
 # phpstorm project files
 .idea
 
+# sass-cache
+.sass-cache
+
 # netbeans project files
 nbproject
 

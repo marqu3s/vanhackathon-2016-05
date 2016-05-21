@@ -1,4 +1,5 @@
 <?php
 return [
-    'adminEmail' => 'admin@example.com',
+    'adminEmail' => 'joao@jjmf.com',
+    'websocketAddress' => 'http://vanhackathon.dev:49160',
 ];
