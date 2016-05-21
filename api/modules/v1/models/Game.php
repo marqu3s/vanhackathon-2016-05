@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace api\modules\v1\models;
 
 use yii;
 use yii\behaviors\TimestampBehavior;
@@ -16,10 +16,13 @@ use yii\db\ActiveRecord;
  * @property integer $id_player_winner
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $started_at
+ * @property integer $ended_at
  *
  * @property Player $idPlayerOwner
  * @property Player $idPlayerWinner
  * @property Match[] $matches
+ * @property Player[] $idPlayers
  */
 class Game extends \yii\db\ActiveRecord
 {
@@ -64,7 +67,7 @@ class Game extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_player_owner', 'id_player_winner', 'created_at', 'updated_at'], 'integer'],
+            [['id_player_owner', 'id_player_winner', 'created_at', 'updated_at', 'started_at', 'ended_at'], 'integer'],
             [['available_colors', 'code'], 'string', 'max' => 15],
             [['id_player_owner'], 'exist', 'skipOnError' => true, 'targetClass' => Player::className(), 'targetAttribute' => ['id_player_owner' => 'id']],
             [['id_player_winner'], 'exist', 'skipOnError' => true, 'targetClass' => Player::className(), 'targetAttribute' => ['id_player_winner' => 'id']],
@@ -84,6 +87,8 @@ class Game extends \yii\db\ActiveRecord
             'id_player_winner' => 'Id Player Winner',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'started_at' => 'Started At',
+            'ended_at' => 'Ended At',
         ];
     }
 
@@ -121,6 +126,14 @@ class Game extends \yii\db\ActiveRecord
     public function getIdPlayerWinner()
     {
         return $this->hasOne(Player::className(), ['id' => 'id_player_winner']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIdPlayers()
+    {
+        return $this->hasMany(Player::className(), ['id' => 'id_player'])->viaTable('match', ['id_game' => 'id']);
     }
 
     /**

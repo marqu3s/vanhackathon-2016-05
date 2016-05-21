@@ -53,8 +53,9 @@ return [
                     //'only' => ['index', 'create']
                     'patterns' => [
                         'GET' => 'index',
-                        'POST join' => 'join',
                         'POST new' => 'new',
+                        'POST join' => 'join',
+                        'POST start' => 'start',
                         'POST leave' => 'leave',
                         'POST guess' => 'guess',
                     ]
@@ -68,7 +69,7 @@ return [
             ],
         ],
         'user' => [
-            'identityClass' => 'common\models\Player',
+            'identityClass' => 'api\modules\v1\models\Player',
             'enableAutoLogin' => true,
             'enableSession' => false,
             'loginUrl' => null

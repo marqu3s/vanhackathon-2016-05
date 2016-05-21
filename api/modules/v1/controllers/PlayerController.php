@@ -13,11 +13,11 @@ namespace api\modules\v1\controllers;
 use yii;
 use yii\rest\ActiveController;
 use api\controllers\MastermindController;
-use common\models\Player;
+use api\modules\v1\models\Player;
 
 class PlayerController extends ActiveController
 {
-    public $modelClass = 'common\models\Player';
+    public $modelClass = 'api\modules\v1\models\Player';
 
     /**
      * Get a Player by its token sent via GET or POST
