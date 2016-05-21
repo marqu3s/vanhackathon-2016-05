@@ -3,6 +3,8 @@ VanHackathon Axiom Zen Challenges
 
 This project uses a [Yii 2](http://www.yiiframework.com/) Advanced Project Template.
 
+It's hosted at Github: https://github.com/marqu3s/vanhackathon-2016-05
+
 There are 2 tiers:
 
 * api - Code developed for challenge 1 (Mastermind game API)
