@@ -1,43 +1,39 @@
-Yii 2 Advanced Project Template
-===============================
+VanHackathon Axiom Zen Challenges
+=================================
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+This project uses a [Yii 2](http://www.yiiframework.com/) Advanced Project Template.
 
-The template includes three tiers: front end, back end, and console, each of which
-is a separate Yii application.
+There are 2 tiers:
 
-The template is designed to work in a team development environment. It supports
-deploying the application in different environments.
+* api - Code developed for challenge 1 (Mastermind game API)
+* frontend - Code developed for challenge 2 (A frontend consuming the API of challenge 1) 
 
-Documentation is at [docs/guide/README.md](docs/guide/README.md).
+Inside of these 2 folders the most important part of code are inside the subfolders: config, controllers, models, modules and views
 
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-app-advanced/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Total Downloads](https://poser.pugx.org/yiisoft/yii2-app-advanced/downloads.png)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Build Status](https://travis-ci.org/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-advanced)
+The rest of the folders are mostly framework folders. Here is an overview of the project folder:
+
 
 DIRECTORY STRUCTURE
 -------------------
 
 ```
+api
+    config/              contains api configurations
+    controllers/         contains api controller classes
+    modules/             contains api-specific modelules classes
+    runtime/             contains files generated during runtime
+    web/                 contains the entry script and Web resources
 common
     config/              contains shared configurations
     mail/                contains view files for e-mails
-    models/              contains model classes used in both backend and frontend
+    models/              contains model classes used in both api and frontend
 console
     config/              contains console configurations
     controllers/         contains console controllers (commands)
     migrations/          contains database migrations
     models/              contains console-specific model classes
     runtime/             contains files generated during runtime
-backend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains backend configurations
-    controllers/         contains Web controller classes
-    models/              contains backend-specific model classes
-    runtime/             contains files generated during runtime
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
+environments/            contains environment-based overrides
 frontend
     assets/              contains application assets such as JavaScript and CSS
     config/              contains frontend configurations
@@ -47,8 +43,15 @@ frontend
     views/               contains view files for the Web application
     web/                 contains the entry script and Web resources
     widgets/             contains frontend widgets
-vendor/                  contains dependent 3rd-party packages
-environments/            contains environment-based overrides
 tests                    contains various tests for the advanced application
     codeception/         contains tests developed with Codeception PHP Testing Framework
+vendor/                  contains dependent 3rd-party packages
 ```
+
+
+SETUP INSTRUCTIONS
+------------------
+
+This projects uses a MySQL database. The dump is included in the root folder - database_mysql.sql
+
+After importing the dump, adjust the components['db'] configuration in common/config/main-local.php accordingly.
