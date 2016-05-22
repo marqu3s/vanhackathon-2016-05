@@ -110,6 +110,12 @@ class SiteController extends Controller
     {
         $this->registerWebsocketAddress();
 
+        # Player have a valid token in a cookie?
+        // get the cookie collection (yii\web\CookieCollection) from the "request" component
+        $cookies = Yii::$app->request->cookies;
+        $token = $cookies->getValue('mastermind-token', '');
+        Yii::$app->view->registerJs("var token = '" . $token . "';", View::POS_HEAD);
+
         if (Yii::$app->request->post()) {
             $name = Yii::$app->request->post('name');
             $message = Yii::$app->request->post('message');
@@ -118,7 +124,6 @@ class SiteController extends Controller
                 'channel' => 'notification',
                 'message' => Json::encode(['name' => $name, 'message' => $message])
             ]);
-
         }
 
         return $this->render('chat');
@@ -197,7 +202,11 @@ class SiteController extends Controller
         return $this->renderPartial('_gamesRoom', ['response' => $response]);
     }
 
-
+    /**
+     * Sets a player status.
+     * If all players are with status = 'ready' emit a startgame message.
+     * @return mixed
+     */
     public function actionAjaxSetPlayerStatus()
     {
         $response = $this->requestApi('v1/game/player-status', 'POST',  [
@@ -206,9 +215,37 @@ class SiteController extends Controller
             'status' => Yii::$app->request->post('status')
         ]);
 
+        # Check if all Players are ready
+        $allPlayersReady = true;
+        foreach ($response as $player) {
+            if ($player['player_status'] != 'ready') {
+                $allPlayersReady = false;
+                break;
+            }
+        }
+
+        if ($allPlayersReady) {
+            Yii::$app->redis->executeCommand('PUBLISH', [
+                'channel' => 'notification',
+                'message' => Json::encode(['task' => 'startgame', 'idGame' => Yii::$app->request->post('idGame')])
+            ]);
+        }
+
         Yii::$app->response->format = 'json';
 
         return $response;
+    }
+
+    
+    public function actionAjaxGetGameBoard()
+    {
+        $idGame = Yii::$app->request->post('idGame');
+        $response = $this->requestApi('v1/match/start', 'GET', ['id' => $idGame]);
+        if (isset($response['message'])) {
+            $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
+        }
+
+        return $this->renderPartial('_gameBoard', ['game' => $response]);
     }
 
 

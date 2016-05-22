@@ -20,10 +20,13 @@ io.on('connection', function (socket) {
     var redisClient = redis.createClient(redisServerPort, redisServerHost);
 
     redisClient.subscribe('notification');
+    // redisClient.subscribe('startgame');
 
     redisClient.on("message", function(channel, message) {
         console.log("New message: " + message + ". In channel: " + channel);
-        socket.emit(channel, message);
+        // socket.emit(channel, message);
+        var messageJson = JSON.parse(message);
+        socket.emit('game' + messageJson.idGame, message);
     });
 
     socket.on('disconnect', function() {
@@ -32,12 +35,25 @@ io.on('connection', function (socket) {
 
     socket.on('subscribe', function(room) {
         console.log('joining room', room);
+        redisClient.subscribe(room);
         socket.join(room);
     });
 
-    socket.on('unsubscribe', function(room) {
+    /*socket.on('unsubscribe', function(room) {
         console.log('leaving room', room);
+        redisClient.unsubscribe(room);
         socket.leave(room);
-    });
+    });*/
+
+    /*socket.on('start-game', function(room) {
+        console.log('Server: Starting game - ' + room);
+        socket.emit(room, 'start-game');
+    });*/
+
+    /*redisClient.on("startgame", function(channel, message) {
+        console.log("New message: " + message + ". In channel: " + channel);
+        socket.emit('game' + message.idGame, message);
+        // socket.emit('startgame', message);
+    });*/
 
 });

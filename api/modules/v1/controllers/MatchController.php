@@ -45,7 +45,7 @@ class MatchController extends ActiveController
 
     /**
      * A player starts a match.
-     * @return bool
+     * @return Game
      */
     public function actionStart()
     {
@@ -58,7 +58,7 @@ class MatchController extends ActiveController
             $game->started_at = time();
             $game->save();
 
-            return true;
+            return $game;
         }
 
     }

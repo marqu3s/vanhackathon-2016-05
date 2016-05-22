@@ -1,7 +1,9 @@
 /**
  * Created by joao on 21/05/16.
  */
-/* global token, socket */
+/* global token, websocketAddress, io */
+
+var socket = io.connect(websocketAddress);
 
 function checkPlayer() {
     if (token === '') {
@@ -9,6 +11,14 @@ function checkPlayer() {
     } else {
         $('#divNewGameJoinGame').removeClass('hidden').addClass('animated fadeIn');
     }
+}
+
+function startGame(id) {
+    console.log('Starting game ' + id);
+    $('#divGameRoom').addClass('hidden').removeClass('animated slideInLeft');
+    $('#divGameBoard').load('/site/ajax-get-game-board', {idGame: id}, function() {
+        $(this).removeClass('hidden').addClass('animated fadeIn');
+    });
 }
 
 function updateGameRoom(id) {
@@ -43,7 +53,13 @@ function joinExistingGame() {
 
 function joinThisGame(id) {
     // Join player on the game room
-    socket.emit('subscribe', 'game-' + id);
+    socket.emit('subscribe', 'game' + id);
+    socket.on('game' + id, function (data) {
+        var message = JSON.parse(data);
+        console.log(message);
+        startGame(message.idGame);
+    });
+    console.log('Player subscribed to channel: game' + id);
 
     // Update the game room table
     updateGameRoom(id);
@@ -56,18 +72,17 @@ function setPlayerStatus(idGame, idPlayer, status) {
         // Update the game room table
         updateGameRoom(idGame);
 
-        var allPlayersReady = true;
-        $.each(result, function(i, match) {
-            if (match.player_status != 'ready') allPlayersReady = false;
-        });
+        /*var allPlayersReady = true;
+         $.each(result, function(i, match) {
+         if (match.player_status != 'ready') allPlayersReady = false;
+         });
 
-        if (allPlayersReady) {
-            console.log('All players ready! Starting game...');
-        }
+         if (allPlayersReady) {
+         console.log('All players ready! Starting game...');
+         socket.emit('start-game', 'game-' + idGame);
+         }*/
     });
 }
-
-
 
 $(document).ready(function () {
 

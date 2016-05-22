@@ -688,6 +688,15 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
+	"\/frontend\/views\/site\/_gameBoard.php": {
+		"fileType": 8192,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/frontend\/views\/site\/_gameBoard.php",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
 	"\/frontend\/views\/site\/_gamesList.php": {
 		"fileType": 8192,
 		"ignore": 0,
