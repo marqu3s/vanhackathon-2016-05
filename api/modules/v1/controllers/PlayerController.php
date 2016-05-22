@@ -43,6 +43,15 @@ class PlayerController extends ActiveController
     }
 
     /**
+     * Return a player data by its token
+     * @return \api\modules\v1\models\Player
+     */
+    public function actionGetPlayer()
+    {
+        return self::getPlayer();
+    }
+
+    /**
      * Returns all the matches the player had joined and that are active.
      * @return Match[]
      */

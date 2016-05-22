@@ -77,6 +77,7 @@ return [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/player'],
                     'extraPatterns' => [
+                        'GET get-player' => 'get-player',
                         'GET matches' => 'matches',
                         'GET active-matches' => 'active-matches',
                         'GET inactive-matches' => 'inactive-matches',

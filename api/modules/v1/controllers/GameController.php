@@ -10,6 +10,7 @@
 
 namespace api\modules\v1\controllers;
 
+use api\modules\v1\models\PlayerGuessHistory;
 use yii;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\ActiveController;
@@ -49,12 +50,17 @@ class GameController extends ActiveController
     }
 
     /**
-     * Return a list of the open games
+     * Return a list of the open games.
+     * If an ID it set, return the game info.
      */
     public function actionIndex($id = null)
     {
-        $where = 'game.started_at IS NULL';
-        if ($id !== null) $where .= ' AND game.id = ' . $id;
+        if ($id !== null) {
+            $where[] = 'game.id = ' . $id;
+        } else {
+            $where[] = 'game.started_at IS NULL';
+        }
+        $where = implode(' AND ', $where);
 
         $query = Game::find()
             ->with(['players', 'matches'])
@@ -64,6 +70,10 @@ class GameController extends ActiveController
 
         if ($id !== null) {
             $games = $query->one();
+            foreach ($games['players'] as $i => $data) {
+                $history = PlayerGuessHistory::find()->where(['id_game' => $games['id'], 'id_player' => $data['id']])->asArray()->all();
+                $games['matches'][$i]['history'] = $history;
+            }
         } else {
             $games = $query->all();
         }

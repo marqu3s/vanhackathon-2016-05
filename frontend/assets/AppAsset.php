@@ -13,9 +13,11 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'css/palette-color-picker.css',
     ];
     public $js = [
         'js/notification.js',
+        'js/palette-color-picker.min.js',
         'js/site-min.js',
     ];
     public $depends = [

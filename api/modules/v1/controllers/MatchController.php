@@ -58,9 +58,8 @@ class MatchController extends ActiveController
             $game->started_at = time();
             $game->save();
 
-            return $game;
+            return Game::find()->with(['players', 'matches'])->where(['id' => $idGame])->asArray()->one();
         }
-
     }
 
     /**

@@ -59,3 +59,4 @@ use yii\helpers\Html;
 <div id="divGamesList"></div>
 <div id="divGameRoom"></div>
 <div id="divGameBoard" class="hidden"></div>
+

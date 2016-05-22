@@ -814,6 +814,15 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
+	"\/frontend\/web\/css\/palette-color-picker.css": {
+		"fileType": 16,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/frontend\/web\/css\/palette-color-picker.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
 	"\/frontend\/web\/css\/site.css": {
 		"fileType": 16,
 		"ignore": 1,
@@ -872,6 +881,17 @@
 		"ignoreWasSetByUser": 1,
 		"inputAbbreviatedPath": "\/frontend\/web\/js\/notification.js",
 		"outputAbbreviatedPath": "\/frontend\/web\/js\/min\/notification-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1,
+		"syntaxCheckerStyle": 1
+		},
+	"\/frontend\/web\/js\/palette-color-picker.min.js": {
+		"fileType": 64,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/frontend\/web\/js\/palette-color-picker.min.js",
+		"outputAbbreviatedPath": "\/frontend\/web\/js\/min\/palette-color-picker.min-min.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 1,

@@ -13,6 +13,17 @@ function checkPlayer() {
     }
 }
 
+function subscribePlayer(id) {
+    // Join player on the game room
+    socket.emit('subscribe', 'game' + id);
+    socket.on('game' + id, function (data) {
+        var message = JSON.parse(data);
+        console.log(message);
+        startGame(message.idGame);
+    });
+    console.log('Player subscribed to channel: game' + id);
+}
+
 function startGame(id) {
     console.log('Starting game ' + id);
     $('#divGameRoom').addClass('hidden').removeClass('animated slideInLeft');
@@ -22,7 +33,7 @@ function startGame(id) {
 }
 
 function updateGameRoom(id) {
-    $('#divGameRoom').load('/site/ajax-join-game', {id: id}, function() {
+    $('#divGameRoom').load('/site/ajax-update-game-room', {id: id}, function() {
         $('#divGamesList').removeClass('animated slideInLeft fadeIn').addClass('hidden');
         $(this).removeClass('hidden').addClass('animated slideInLeft');
     });
@@ -32,13 +43,13 @@ function createNewGame() {
     $.ajax({
         url: '/site/ajax-host-game',
         type: 'post',
+        dataType: 'json',
         data: {secret_size: $('#secret_size').val()},
-        success: function (result) {
-            $('#divGameSettings').adddClass('hidden').removeClass('animated fadeIn');
-            $('#divGameRoom').load('/site/ajax-join-game', {id: result.id_game}, function() {
-                $('#divGamesList').removeClass('animated slideInLeft fadeIn').addClass('hidden');
-                $('#divGameRoom').removeClass('hidden').addClass('animated slideInLeft');
-            });
+        success: function (data) {
+            $('#divGameSettings').addClass('hidden').removeClass('animated fadeIn');
+            subscribePlayer(data.id_game);
+            updateGameRoom(data.id_game);
+            console.log('Player ' + token + ' joinned game ' + data.id_game);
         }
     });
 }
@@ -52,35 +63,35 @@ function joinExistingGame() {
 }
 
 function joinThisGame(id) {
-    // Join player on the game room
-    socket.emit('subscribe', 'game' + id);
-    socket.on('game' + id, function (data) {
-        var message = JSON.parse(data);
-        console.log(message);
-        startGame(message.idGame);
-    });
-    console.log('Player subscribed to channel: game' + id);
+    subscribePlayer(id);
 
-    // Update the game room table
-    updateGameRoom(id);
+    $.post('/site/ajax-join-game', {idGame: id}, function (result) {
+        // Update the game room table
+        updateGameRoom(id);
+    });
 
     console.log('Player ' + token + ' joinned game ' + id);
 }
 
 function setPlayerStatus(idGame, idPlayer, status) {
-    $.post('/site/ajax-set-player-status', {idGame: idGame, idPlayer: idPlayer, status: status}, function (result) {
-        // Update the game room table
-        updateGameRoom(idGame);
+    $.ajax({
+        type: 'post',
+        url: '/site/ajax-set-player-status',
+        data: {idGame: idGame, idPlayer: idPlayer, status: status},
+        complete: function (result) {
+            // Update the game room table
+            updateGameRoom(idGame);
 
-        /*var allPlayersReady = true;
-         $.each(result, function(i, match) {
-         if (match.player_status != 'ready') allPlayersReady = false;
-         });
+            /*var allPlayersReady = true;
+             $.each(result, function(i, match) {
+             if (match.player_status != 'ready') allPlayersReady = false;
+             });
 
-         if (allPlayersReady) {
-         console.log('All players ready! Starting game...');
-         socket.emit('start-game', 'game-' + idGame);
-         }*/
+             if (allPlayersReady) {
+             console.log('All players ready! Starting game...');
+             socket.emit('start-game', 'game-' + idGame);
+             }*/
+        }
     });
 }
 

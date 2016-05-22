@@ -192,14 +192,16 @@ class SiteController extends Controller
      */
     public function actionAjaxJoinGame()
     {
-        $response = $this->requestApi('v1/game/join', 'POST', ['id' => Yii::$app->request->post('id')]);
-        if (isset($response['message'])) {
+        $response = $this->requestApi('v1/game/join', 'POST', ['id' => Yii::$app->request->post('idGame')]);
+        //if (isset($response['message'])) {
             # The player is already in this match.
-            $response = $this->requestApi('v1/game', 'GET', ['id' => Yii::$app->request->post('id')]);
+            //$response = $this->requestApi('v1/game', 'GET', ['id' => Yii::$app->request->post('id')]);
             //\yii\helpers\VarDumper::dump($response,10,true); die;
-        }
+        //}
 
-        return $this->renderPartial('_gamesRoom', ['response' => $response]);
+        //return $this->renderPartial('_gamesRoom', ['response' => $response]);
+        Yii::$app->response->format = 'json';
+        return $response;
     }
 
     /**
@@ -236,16 +238,31 @@ class SiteController extends Controller
         return $response;
     }
 
+    /**
+     * Updates a game room
+     * @return string
+     */
+    public function actionAjaxUpdateGameRoom()
+    {
+        $response = $this->requestApi('v1/game', 'GET', ['id' => Yii::$app->request->post('id')]);
+
+        return $this->renderPartial('_gamesRoom', ['response' => $response]);
+    }
+
     
     public function actionAjaxGetGameBoard()
     {
         $idGame = Yii::$app->request->post('idGame');
-        $response = $this->requestApi('v1/match/start', 'GET', ['id' => $idGame]);
+        $player = $this->requestApi('v1/players/get-player');
+
+        $response = $this->requestApi('v1/match/start', 'POST', ['id' => $idGame]);
+
+
         if (isset($response['message'])) {
             $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
         }
 
-        return $this->renderPartial('_gameBoard', ['game' => $response]);
+        return $this->renderAjax('_gameBoard', ['game' => $response, 'player' => $player]);
     }
 
 
