@@ -4,8 +4,15 @@
 
 /* global websocketAddress, io */
 
+var socket = io.connect(websocketAddress);
+
 $(document).ready(function() {
-    var socket = io.connect(websocketAddress);
+    socket.on('message', function (data) {
+        console.log(data);
+    });
+
+    
+    // socket.emit('subscribe', 'roomTwo');
 
     socket.on('notification', function (data) {
         var message = JSON.parse(data);

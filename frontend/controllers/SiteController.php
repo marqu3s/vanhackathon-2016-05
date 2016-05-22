@@ -198,6 +198,20 @@ class SiteController extends Controller
     }
 
 
+    public function actionAjaxSetPlayerStatus()
+    {
+        $response = $this->requestApi('v1/game/player-status', 'POST',  [
+            'idGame' => Yii::$app->request->post('idGame'),
+            'idPlayer' => Yii::$app->request->post('idPlayer'),
+            'status' => Yii::$app->request->post('status')
+        ]);
+
+        Yii::$app->response->format = 'json';
+
+        return $response;
+    }
+
+
 
 
 

@@ -139,5 +139,36 @@ class GameController extends ActiveController
 
         return true;
     }
+
+    /**
+     * Set (POST verb) or get (GET verb) a player status in a match.
+     * @return \api\modules\v1\models\Match[]
+     * @throws \Exception
+     */
+    public function actionPlayerStatus()
+    {
+        $idGame = (int) Yii::$app->request->post('idGame', Yii::$app->request->get('idGame'));
+        $idPlayer = (int) Yii::$app->request->post('idPlayer', Yii::$app->request->get('idPlayer'));
+        $status = Yii::$app->request->post('status');
+
+        $result = [];
+        if (Yii::$app->request->method == 'POST') {
+            # Set player status
+            $match = Match::find()->where("id_game = $idGame AND id_player = $idPlayer")->one();
+            $match->player_status = $status;
+            $match->update();
+
+            # Get all player status
+            $result = Match::find()->where("id_game = $idGame")->all();
+        } elseif (Yii::$app->request->method == 'GET') {
+            if ($idPlayer === 0) {
+                $result = Match::find()->where("id_game = $idGame")->all();
+            } else {
+                $result = Match::find()->where("id_game = $idGame AND id_player = $idPlayer")->one();
+            }
+        }
+
+        return $result;
+    }
     
 }

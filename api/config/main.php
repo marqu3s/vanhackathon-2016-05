@@ -55,6 +55,8 @@ return [
                         'POST new' => 'new',
                         'POST join' => 'join',
                         'POST leave' => 'leave',
+                        'GET player-status' => 'player-status',
+                        'POST player-status' => 'player-status',
                     ]
                 ],
 
