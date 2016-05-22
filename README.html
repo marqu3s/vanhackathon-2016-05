@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+</head>
+<body>
+<h1 id="vanhackathonaxiomzenchallenges">VanHackathon Axiom Zen Challenges</h1>
+
+<h2 id="answertothequestionsasked">Answer to the questions asked</h2>
+
+<p>Q1. What was the hardest part?
+R: Playing with socket.io library during the frontend challenge development. I&#8217;ve never used it so had to study it durting the hackathon.</p>
+
+<p>Q2. If you could go back and give yourself advice at the beginning of the project, what would it be?
+R: I think that the backend challenge went pretty good, but if I knew how hard it would be to do the
+frontend challenge the way I tried to do it, I would advice myself to forget about it and focus just on the backend
+to polish it to the maximum.</p>
+
+<p>Q3. If you could change something about this challenge, what would it be?
+R: I would probably team up with a frontend developer. I was affraid of doing it this time not because I don&#8217;t like to work as a team,
+but because I was affraid to didn&#8217;t have time to finish my part on the project and harm the others on the team.</p>
+
+<h2 id="abouttheproject">About the project</h2>
+
+<p>This project uses a <a href="http://www.yiiframework.com/">Yii 2</a> Advanced Project Template.</p>
+
+<p>It&#8217;s hosted at Github: https://github.com/marqu3s/vanhackathon&#8211;2016&#8211;05</p>
+
+<p>There are 2 tiers:</p>
+
+<ul>
+<li>api - Code developed for challenge 1 (Mastermind game API)</li>
+<li>frontend - Code developed for challenge 2 (A frontend consuming the API of challenge 1)</li>
+</ul>
+
+<p>Inside of these 2 folders the most important part of code are inside the subfolders: config, controllers, models, modules and views</p>
+
+<p>The rest of the folders are mostly framework folders. Here is an overview of the project folder:</p>
+
+<h2 id="directorystructure">Directory Structure</h2>
+
+<pre><code>api
+    config/              contains api configurations
+    controllers/         contains api controller classes
+    modules/             contains api-specific modelules classes
+    runtime/             contains files generated during runtime
+    web/                 contains the entry script and Web resources
+common
+    config/              contains shared configurations
+    mail/                contains view files for e-mails
+    models/              contains model classes used in both api and frontend
+console
+    config/              contains console configurations
+    controllers/         contains console controllers (commands)
+    migrations/          contains database migrations
+    models/              contains console-specific model classes
+    runtime/             contains files generated during runtime
+environments/            contains environment-based overrides
+frontend
+    assets/              contains application assets such as JavaScript and CSS
+    config/              contains frontend configurations
+    controllers/         contains Web controller classes
+    models/              contains frontend-specific model classes
+    runtime/             contains files generated during runtime
+    views/               contains view files for the Web application
+    web/                 contains the entry script and Web resources
+    widgets/             contains frontend widgets
+tests                    contains various tests for the advanced application
+    codeception/         contains tests developed with Codeception PHP Testing Framework
+vendor/                  contains dependent 3rd-party packages
+</code></pre>
+
+<h2 id="setupinstructions">Setup Instructions</h2>
+
+<p>This projects uses a MySQL database. The dump is included in the root folder - <code>database_mysql.sql</code></p>
+
+<p>After importing the dump, adjust the <code>components['db']</code> configuration in <code>common/config/main.php</code> accordingly.</p>
+
+<p>Install the composer depencies by running: <code>composer update</code> on the root folder.</p>
+
+<p>Set document roots of your web server:</p>
+
+<ul>
+<li>for api <code>/path/to/project/api/web/</code> and using a local URL of your choice, like http://api.mastermind.dev/</li>
+<li>for frontend <code>/path/to/project/frontend/web/</code> and using a local URL of your choice, like http://mastermind.dev/</li>
+</ul>
+
+<p>For Apache it could be the following:</p>
+
+<pre><code>&lt;VirtualHost *:80&gt;
+   ServerName mastermind.dev
+   DocumentRoot &quot;/path/to/project/frontend/web/&quot;
+
+   &lt;Directory &quot;/path/to/project/frontend/web/&quot;&gt;
+       # use mod_rewrite for pretty URL support
+       RewriteEngine on
+       # If a directory or a file exists, use the request directly
+       RewriteCond %{REQUEST_FILENAME} !-f
+       RewriteCond %{REQUEST_FILENAME} !-d
+       # Otherwise forward the request to index.php
+       RewriteRule . index.php
+
+       # use index.php as index file
+       DirectoryIndex index.php
+
+       # ...other settings...
+   &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost *:80&gt;
+   ServerName api.mastermind.dev
+   DocumentRoot &quot;/path/to/project/api/web/&quot;
+
+   &lt;Directory &quot;/path/to/project/api/web/&quot;&gt;
+       # use mod_rewrite for pretty URL support
+       RewriteEngine on
+       # If a directory or a file exists, use the request directly
+       RewriteCond %{REQUEST_FILENAME} !-f
+       RewriteCond %{REQUEST_FILENAME} !-d
+       # Otherwise forward the request to index.php
+       RewriteRule . index.php
+
+       # use index.php as index file
+       DirectoryIndex index.php
+
+       # ...other settings...
+   &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>For nginx:</p>
+
+<pre><code>server {
+   charset utf-8;
+   client_max_body_size 128M;
+
+   listen 80; ## listen for ipv4
+   #listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+
+   server_name mastermind.dev;
+   root        /path/to/project/frontend/web/;
+   index       index.php;
+
+   access_log  /path/to/project/log/frontend-access.log;
+   error_log   /path/to/project/log/frontend-error.log;
+
+   location / {
+       # Redirect everything that isn't a real file to index.php
+       try_files $uri $uri/ /index.php$is_args$args;
+   }
+
+   # uncomment to avoid processing of calls to non-existing static files by Yii
+   #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+   #    try_files $uri =404;
+   #}
+   #error_page 404 /404.html;
+
+   location ~ \.php$ {
+       include fastcgi_params;
+       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+       fastcgi_pass   127.0.0.1:9000;
+       #fastcgi_pass unix:/var/run/php5-fpm.sock;
+       try_files $uri =404;
+   }
+
+   location ~ /\.(ht|svn|git) {
+       deny all;
+   }
+}
+
+server {
+   charset utf-8;
+   client_max_body_size 128M;
+
+   listen 80; ## listen for ipv4
+   #listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+
+   server_name api.mastermind.dev;
+   root        /path/to/project/api/web/;
+   index       index.php;
+
+   access_log  /path/to/project/log/api-access.log;
+   error_log   /path/to/project/log/api-error.log;
+
+   location / {
+       # Redirect everything that isn't a real file to index.php
+       try_files $uri $uri/ /index.php$is_args$args;
+   }
+
+   # uncomment to avoid processing of calls to non-existing static files by Yii
+   #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+   #    try_files $uri =404;
+   #}
+   #error_page 404 /404.html;
+
+   location ~ \.php$ {
+       include fastcgi_params;
+       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+       fastcgi_pass   127.0.0.1:9000;
+       #fastcgi_pass unix:/var/run/php5-fpm.sock;
+       try_files $uri =404;
+   }
+
+   location ~ /\.(ht|svn|git) {
+       deny all;
+   }
+}
+</code></pre>
+
+<p>Adjust the logs location to your needs.</p>
+
+<p>Don&#8217;t forget to change the hosts file to point the domain to your server.</p>
+
+<ul>
+<li>Windows: c:\Windows\System32\Drivers\etc\hosts</li>
+<li>Linux: /etc/hosts</li>
+</ul>
+
+<p>Add the following lines:</p>
+
+<ul>
+<li>127.0.0.1 mastermind.dev</li>
+<li>127.0.0.1 api.mastermind.dev</li>
+</ul>
+
+<h2 id="challenge1:apiforplayingmastermindgame">Challenge 1: API for playing Mastermind Game</h2>
+
+<p>The database and the API were built from the begining having multiplayer games in mind.</p>
+
+<p>A documentation is available at Apiary so you can have an overview of its endpoints and supported requests: http://docs.joaomarquesmastermind.apiary.io</p>
+
+<p>A DHC config file is also included on the root folder: <code>vanhackathon.json</code>. DHC is a Google Chrome Extension to test REST APIs.
+You can install it and import the config file. It will create a project named <code>VanHackathon</code> with some API resquests examples used during the development.</p>
+
+<h2 id="challenge2:afrontendforplayingmastermindgamewiththeapifromchallenge1">Challenge 2: A frontend for playing Mastermind Game with the API from challenge 1</h2>
+
+<p>The real challenge here for me (as a developer, not a designer) is to don&#8217;t stress the server with so many requests.</p>
+
+<p>That&#8217;s why I will try my best to build a client using websockets instead of firing a lot of ajax requests to the server.</p>
+
+<p>I&#8217;m not used to websockets but that&#8217;s what I&#8217;m here for: LEARN NEW STUFF!</p>
+
+<p>I decided to focus on making the websockets work. Maybe it will not look so good but hey, thats a designer job!
+I know how to put thinks together with HTML5, CSS3, Javascript, jQuery, Bootstrap because those are the things I know but I&#8217; not that good in creating layouts.
+I know how to bring one to life!</p>
+
+<p>The result you can see by accessing the address http://mastermind.dev (or whatever you decided to use) on your browser.</p>
+
+<p>UPDATE NEAR SUBMIT HOUR: I did not finished this challenge. I had a hard time with the websockets thing. But I was close.
+It was a great experience anyway. I did a lot of resarch on this during the Hackathon and loose a precious time.
+But I think the API is in pretty good shape and is very complete.</p>
+
+<p>See you on the next Hackathon!</p>
+
+<p>Cheers!</p>
+
+</body>
+</html>
