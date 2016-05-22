@@ -299,14 +299,41 @@ class SiteController extends Controller
         }
         $guess = implode(',', $colorCode);
 
-        $response = $this->requestApi('v1/match/guess', 'POST', [
+        # Send guess to API
+        $responseGuess = $this->requestApi('v1/match/guess', 'POST', [
             'id' => $idGame,
             'guess' => $guess
         ]);
 
+        # Get current game data
+        $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
+
+        # Check if all Players are waitting others. This means they all played.
+        $allPlayersReady = true;
+        foreach ($response['matches'] as $player) {
+            if ($player['player_status'] != 'waitting others') {
+                $allPlayersReady = false;
+                break;
+            }
+        }
+
+        if ($allPlayersReady) {
+            $this->requestApi('v1/match/start', 'POST', ['id' => $idGame]);
+            Yii::$app->redis->executeCommand('PUBLISH', [
+                'channel' => 'notification',
+                'message' => Json::encode(['task' => 'all-players-ready', 'idGame' => Yii::$app->request->post('idGame')])
+            ]);
+        }
+
+        # Update game room
+        Yii::$app->redis->executeCommand('PUBLISH', [
+            'channel' => 'notification',
+            'message' => Json::encode(['task' => 'update-room', 'idGame' => Yii::$app->request->post('idGame')])
+        ]);
+
         Yii::$app->response->format = 'json';
 
-        return $response;
+        return $responseGuess;
     }
 
 

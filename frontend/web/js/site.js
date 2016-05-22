@@ -17,9 +17,21 @@ function subscribePlayer(id) {
     // Join player on the game room
     socket.emit('subscribe', 'game' + id);
     socket.on('game' + id, function (data) {
-        var message = JSON.parse(data);
+        var message;
+        try {
+            message = JSON.parse(data);
+        } catch (e) {
+            message = data;
+        }
         console.log(message);
-        startGame(message.idGame);
+        if (message.task == 'startgame') {
+            startGame(message.idGame);
+        } else if (message.task == 'update-room') {
+            updateGameRoom(message.idGame);
+        } else if (message.task == 'all-players-ready') {
+            updateGameRoom(message.idGame);
+            updateGameBoard(message.idGame);
+        }
     });
     console.log('Player subscribed to channel: game' + id);
 }
@@ -27,15 +39,20 @@ function subscribePlayer(id) {
 function startGame(id) {
     console.log('Starting game ' + id);
     $('#divGameRoom').addClass('hidden').removeClass('animated slideInLeft');
-    $('#divGameBoard').load('/site/ajax-get-game-board', {idGame: id}, function() {
-        $(this).removeClass('hidden').addClass('animated fadeIn');
-    });
+    updateGameBoard(id);
 }
 
 function updateGameRoom(id) {
     $('#divGameRoom').load('/site/ajax-update-game-room', {id: id}, function() {
         $('#divGamesList').removeClass('animated slideInLeft fadeIn').addClass('hidden');
         $(this).removeClass('hidden').addClass('animated slideInLeft');
+    });
+}
+
+function updateGameBoard(id) {
+    updateGameRoom(id);
+    $('#divGameBoard').load('/site/ajax-get-game-board', {idGame: id}, function() {
+        $(this).removeClass('hidden').addClass('animated fadeIn');
     });
 }
 
@@ -68,6 +85,9 @@ function joinThisGame(id) {
     $.post('/site/ajax-join-game', {idGame: id}, function (result) {
         // Update the game room table
         updateGameRoom(id);
+
+        // Let other players know
+        socket.emit('player-joinned-game', id);
     });
 
     console.log('Player ' + token + ' joinned game ' + id);
@@ -81,16 +101,6 @@ function setPlayerStatus(idGame, idPlayer, status) {
         complete: function (result) {
             // Update the game room table
             updateGameRoom(idGame);
-
-            /*var allPlayersReady = true;
-             $.each(result, function(i, match) {
-             if (match.player_status != 'ready') allPlayersReady = false;
-             });
-
-             if (allPlayersReady) {
-             console.log('All players ready! Starting game...');
-             socket.emit('start-game', 'game-' + idGame);
-             }*/
         }
     });
 }
@@ -107,6 +117,9 @@ function submitGuess(idGame, idPlayer) {
         data: {idGame: idGame, idPlayer: idPlayer, guess: guess},
         complete: function (result) {
             updateGameRoom(idGame);
+            updateGameBoard(idGame);
+            $('#btnSubmitGuess').hide();
+            $('#btnSubmitGuessMsg').show();
         }
     });
 }

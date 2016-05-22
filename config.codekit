@@ -949,17 +949,6 @@
 		"randomFootnoteNumbers": 0,
 		"useCompatibilityMode": 0
 		},
-	"\/nodejs\/min\/server-min.js": {
-		"fileType": 64,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/nodejs\/min\/server-min.js",
-		"outputAbbreviatedPath": "\/nodejs\/min\/min\/server-min-min.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 1,
-		"syntaxCheckerStyle": 1
-		},
 	"\/nodejs\/package.json": {
 		"fileType": 524288,
 		"ignore": 1,
@@ -973,8 +962,8 @@
 		},
 	"\/nodejs\/server.js": {
 		"fileType": 64,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
+		"ignore": 1,
+		"ignoreWasSetByUser": 1,
 		"inputAbbreviatedPath": "\/nodejs\/server.js",
 		"outputAbbreviatedPath": "\/nodejs\/min\/server-min.js",
 		"outputPathIsOutsideProject": 0,

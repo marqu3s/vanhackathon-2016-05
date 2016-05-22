@@ -28,6 +28,7 @@ foreach ($game['matches'] as $idInArray => $data) {
     if ($data['id_player'] == $thisPlayerId) {
         $numGuesses = (int) $data['num_guesses'];
         $availableGuesses = $maxChancesToGuess - $numGuesses;
+        $playerStatus = $data['player_status'];
         break;
     }
 }
@@ -75,7 +76,8 @@ foreach ($game['matches'] as $idInArray => $data) {
                         </td>
                     <?php endfor ?>
                     <td>
-                        <button id="btnSubmitGuess" class="btn btn-success btn-xs" data-idgame="<?= $game['id'] ?>" data-idplayer="<?= $thisPlayerId ?>">Submit Guess</button>
+                        <button id="btnSubmitGuess" class="btn btn-success btn-xs" data-idgame="<?= $game['id'] ?>" data-idplayer="<?= $thisPlayerId ?>" style="display: <?php if ($playerStatus != 'ready') echo 'none' ?>;">Submit Guess</button>
+                        <p id="btnSubmitGuessMsg" style="display: <?php if ($playerStatus != 'waitting others') echo 'none' ?>;">Waitting for other players.</p>
                     </td>
                 </tr>
             <?php endif ?>

@@ -53,13 +53,18 @@ class MatchController extends ActiveController
 
         $game = Game::findOne($idGame);
         if ($game->started_at > 0) {
-            return MastermindController::returnError('This game has already started.');
+            // return MastermindController::returnError('This game has already started.');
         } else {
             $game->started_at = time();
             $game->save();
 
-            return Game::find()->with(['players', 'matches'])->where(['id' => $idGame])->asArray()->one();
+            $sql = "UPDATE match SET player_status = 'ready' WHERE id_game = $idGame";
+            Yii::$app->db->createCommand($sql)->execute();
+
+            //return Game::find()->with(['players', 'matches'])->where(['id' => $idGame])->asArray()->one();
         }
+
+        return Game::find()->with(['players', 'matches'])->where(['id' => $idGame])->asArray()->one();
     }
 
     /**

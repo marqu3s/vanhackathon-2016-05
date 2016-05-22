@@ -143,6 +143,9 @@ class Match extends ActiveRecord
             return MastermindController::returnError("This game has ended.");
         }
 
+        # Increment the number of player guesses in this match and status.
+        $this->num_guesses++;
+
         # Is the code solved?
         if ($arrGuessCode === $arrSecretCode) {
             $solved = true;
@@ -153,6 +156,9 @@ class Match extends ActiveRecord
             $this->game->id_player_winner = $player->id;
             $this->game->ended_at = time();
             $this->game->save();
+
+            $this->player_status = 'WINNER';
+            $this->save();
         } else {
             $solved = false;
             $message = 'Not this time...';
@@ -170,12 +176,10 @@ class Match extends ActiveRecord
             # Remove the secret code before sending a response.
             # This way the play will not know the secret code by inspecting network traffic.
             $this->game->code = "Shhh! It's a secret!";
-        }
 
-        # Increment the number of player guesses in this match and status.
-        $this->num_guesses++;
-        $this->player_status = 'waitting others';
-        $this->save();
+            $this->player_status = 'waitting others';
+            $this->save();
+        }
 
         # Save player guess, creating a history of guesses.
         $this->savePlayerGuess($player->id, $guessCode, $exactMatches, $nearMatches);
