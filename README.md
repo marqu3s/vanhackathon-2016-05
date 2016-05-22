@@ -1,6 +1,25 @@
 VanHackathon Axiom Zen Challenges
 =================================
 
+Answer to the questions asked
+-----------------------------
+
+Q1. What was the hardest part?
+R: Playing with socket.io library during the frontend challenge development. I've never used it so had to study it durting the hackathon.
+
+Q2. If you could go back and give yourself advice at the beginning of the project, what would it be?
+R: I think that the backend challenge went pretty good, but if I knew how hard it would be to do the
+frontend challenge the way I tried to do it, I would advice myself to forget about it and focus just on the backend
+to polish it to the maximum.
+
+Q3. If you could change something about this challenge, what would it be? 
+R: I would probably team up with a frontend developer. I was affraid of doing it this time not because I don't like to work as a team,
+but because I was affraid to didn't have time to finish my part on the project and harm the others on the team.
+
+
+About the project
+-----------------
+
 This project uses a [Yii 2](http://www.yiiframework.com/) Advanced Project Template.
 
 It's hosted at Github: https://github.com/marqu3s/vanhackathon-2016-05
@@ -219,7 +238,7 @@ Challenge 2: A frontend for playing Mastermind Game with the API from challenge 
 
 The real challenge here for me (as a developer, not a designer) is to don't stress the server with so many requests.
 
-That's why I will try my best to build a client using websockets insteat of firing a lot of ajax requests to the server.
+That's why I will try my best to build a client using websockets instead of firing a lot of ajax requests to the server.
 
 I'm not used to websockets but that's what I'm here for: LEARN NEW STUFF!
 
@@ -228,3 +247,11 @@ I know how to put thinks together with HTML5, CSS3, Javascript, jQuery, Bootstra
 I know how to bring one to life!
 
 The result you can see by accessing the address http://mastermind.dev (or whatever you decided to use) on your browser.
+
+UPDATE NEAR SUBMIT HOUR: I did not finished this challenge. I had a hard time with the websockets thing. But I was close.
+It was a great experience anyway. I did a lot of resarch on this during the Hackathon and loose a precious time.
+But I think the API is in pretty good shape and is very complete.
+
+See you on the next Hackathon!
+
+Cheers!
