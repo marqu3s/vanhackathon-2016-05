@@ -34,3 +34,27 @@ use yii\helpers\Html;
     </div>
 </div>
 
+<div id="divNewGameJoinGame" class="row hidden">
+    <div class="col-xs-6 col-md-3 col-md-offset-3">
+        <button id="btnHostGame" class="btn btn-primary btn-large btn-block">Host new game</button>
+    </div>
+    <div class="col-xs-6 col-md-3">
+        <button id="btnJoinGame" class="btn btn-primary btn-large btn-block">Join a game</button>
+    </div>
+</div>
+<div id="divGameSettings" class="row hidden">
+    <div class="col-xs-6 col-md-3 col-md-offset-3">
+        <div class="form-group">
+            <p>Choose the code size:</p>
+            <?= Html::dropDownList('secret_size', null, ['2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6', '7' => '7', '8' => '8'], ['id' => 'secret_size', 'class' => 'form-control']) ?>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-3">
+        <div class="form-group">
+            <p>&nbsp;</p>
+            <?= Html::button('OK', ['id' => 'btnCreateGame', 'class' => 'btn btn-block btn-success']) ?>
+        </div>
+    </div>
+</div>
+<div id="divGamesList"></div>
+<div id="divGameRoom"></div>

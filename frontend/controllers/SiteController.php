@@ -158,6 +158,49 @@ class SiteController extends Controller
     }
 
 
+    ### AJAX ###
+
+    /**
+     * The list of open games
+     * @return string
+     */
+    public function actionAjaxGamesList()
+    {
+        $response = $this->requestApi('v1/game');
+
+        return $this->renderPartial('_gamesList', ['response' => $response]);
+    }
+
+    /** Host new game */
+    public function actionAjaxHostGame()
+    {
+        $response = $this->requestApi('v1/game/new', 'POST',  ['secret_size' => Yii::$app->request->post('secret_size')]);
+
+        Yii::$app->response->format = 'json';
+
+        return $response;
+    }
+
+    /**
+     * Join a games
+     * @return string
+     */
+    public function actionAjaxJoinGame()
+    {
+        $response = $this->requestApi('v1/game/join', 'POST', ['id' => Yii::$app->request->post('id')]);
+        if (isset($response['message'])) {
+            # The player is already in this match.
+            $response = $this->requestApi('v1/game', 'GET', ['id' => Yii::$app->request->post('id')]);
+            //\yii\helpers\VarDumper::dump($response,10,true); die;
+        }
+
+        return $this->renderPartial('_gamesRoom', ['response' => $response]);
+    }
+
+
+
+
+
     /**
      * Register a global javascript variable with the address of our websocket server.
      * This will be used by frontend/web/js/notification.js
@@ -166,7 +209,6 @@ class SiteController extends Controller
     {
         Yii::$app->view->registerJs("var websocketAddress = '" . Yii::$app->params['websocketAddress'] . "';", View::POS_HEAD);
     }
-
 
     /**
      * Make a request to the Mastermind API.
@@ -177,8 +219,21 @@ class SiteController extends Controller
      */
     public function requestApi($action, $method = 'GET', $params = [])
     {
-        $apiUrl = Yii::$app->params['apiAddress'] . "/$action";
-        $result = $this->executeCurl($apiUrl, $method, http_build_query($params));
+        $apiUrl = Yii::$app->params['apiAddress'] . "/{$action}?";
+
+        if (isset($_SESSION['token'])) {
+            $apiUrl .= "token=" . $_SESSION['token'];
+        }
+
+        //\yii\helpers\VarDumper::dump(http_build_query($params),10,true); die;
+
+        if (strtolower($method) == 'get') {
+            $apiUrl .= '&' . http_build_query($params);
+        } else {
+            $params = http_build_query($params);
+        }
+        //\yii\helpers\VarDumper::dump($apiUrl,10); die;
+        $result = $this->executeCurl($apiUrl, $method, $params);
 
         return $result;
     }

@@ -42,6 +42,34 @@ class GameController extends ActiveController
 
         return $behaviors;
     }
+    
+    public function actions()
+    {
+        return [];
+    }
+
+    /**
+     * Return a list of the open games
+     */
+    public function actionIndex($id = null)
+    {
+        $where = 'game.started_at IS NULL';
+        if ($id !== null) $where .= ' AND game.id = ' . $id;
+
+        $query = Game::find()
+            ->with(['players', 'matches'])
+            ->where($where)
+            ->orderBy(['game.id' => SORT_ASC])
+            ->asArray();
+
+        if ($id !== null) {
+            $games = $query->one();
+        } else {
+            $games = $query->all();
+        }
+
+        return $games;
+    }
 
     /**
      * A player creates a new game.
@@ -90,8 +118,9 @@ class GameController extends ActiveController
             return MastermindController::returnError(reset($errors));
         } else {
             $match->save();
+            $game = Game::find()->with(['players', 'matches'])->where("id = $idGame")->asArray()->one();
 
-            return $match;
+            return $game;
         }
     }
 
