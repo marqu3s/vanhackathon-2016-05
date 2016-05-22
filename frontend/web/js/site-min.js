@@ -1,0 +1,1 @@
+$(document).ready(function(){""===token&&$("#divLogin").removeClass("hidden").addClass("animated fadeIn"),$("#login-form").submit(function(){var a=$(this);return $.ajax({url:a.attr("action"),type:"post",data:a.serialize(),success:function(){document.location.reload()}}),!1})});

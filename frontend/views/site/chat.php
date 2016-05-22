@@ -40,7 +40,7 @@ $this->registerJs($js, \yii\web\View::POS_READY)
         <div class="row">
             <div class="well col-lg-8 col-lg-offset-2">
 
-                <?= Html::beginForm(['/site/index'], 'POST', [
+                <?= Html::beginForm(['/site/chat'], 'POST', [
                     'id' => 'chat-form'
                 ]) ?>
 

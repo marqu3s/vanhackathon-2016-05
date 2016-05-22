@@ -30,6 +30,9 @@ return [
             'port' => 6379, // Adjust the redis port accordingly
             'database' => 0,
         ],
+        'session' => [
+            'class' => 'yii\web\Session',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

@@ -1,14 +1,13 @@
 <?php
 namespace frontend\controllers;
 
-use Yii;
+use yii;
 use yii\base\InvalidParamException;
 use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
@@ -92,7 +91,15 @@ class SiteController extends Controller
     {
         $this->registerWebsocketAddress();
 
-        return $this->render('index');
+        $this->view->title = 'Mastermind';
+
+        # Player have a valid token in a cookie?
+        // get the cookie collection (yii\web\CookieCollection) from the "request" component
+        $cookies = Yii::$app->request->cookies;
+        $token = $cookies->getValue('mastermind-token', '');
+        Yii::$app->view->registerJs("var token = '" . $token . "';", View::POS_HEAD);
+
+        return $this->render('index', ['token' => $token]);
     }
 
     /**
@@ -117,6 +124,39 @@ class SiteController extends Controller
         return $this->render('chat');
     }
 
+    /**
+     * Logs in a user.
+     * For simplicity we send the player name and email to the api to get an access token.
+     * Then store the token in a cookie for the next time.
+     * @return mixed
+     */
+    public function actionLogin()
+    {
+        $data = [
+            'name' => Yii::$app->request->post('name'),
+            'email' => Yii::$app->request->post('email')
+        ];
+
+        $response = $this->requestApi('login', 'POST', $data);
+        
+        # Also store the token on session
+        Yii::$app->session['token'] = $response['token'];
+
+        # Get the cookie collection (yii\web\CookieCollection) from the "response" component
+        $cookies = Yii::$app->response->cookies;
+
+        # Add a new cookie to the response to be sent
+        $cookies->add(new \yii\web\Cookie([
+            'name' => 'mastermind-token',
+            'value' => $response['token'],
+            'expire' => strtotime('now + 30 days')
+        ]));
+
+        Yii::$app->response->format = 'json';
+
+        return $response;
+    }
+
 
     /**
      * Register a global javascript variable with the address of our websocket server.
@@ -124,45 +164,73 @@ class SiteController extends Controller
      */
     private function registerWebsocketAddress()
     {
-        Yii::$app->view->registerJs('var websocketAddress = ' . Yii::$app->params['websocketAddress'] . ';', View::POS_HEAD);
+        Yii::$app->view->registerJs("var websocketAddress = '" . Yii::$app->params['websocketAddress'] . "';", View::POS_HEAD);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
-     * Logs in a user.
-     *
+     * Make a request to the Mastermind API.
+     * @param string $action
+     * @param array $params
+     * @param string $method
      * @return mixed
      */
-    public function actionLogin()
+    public function requestApi($action, $method = 'GET', $params = [])
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+        $apiUrl = Yii::$app->params['apiAddress'] . "/$action";
+        $result = $this->executeCurl($apiUrl, $method, http_build_query($params));
+
+        return $result;
+    }
+
+    /**
+     * Executes CURL
+     * @param string $url
+     * @param bool $params
+     * @param string $method
+     * @return mixed
+     */
+    public function executeCurl($url, $method, $params = false)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url . '');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // TRUE to return the transfer as a string of the return value of curl_exec() instead of outputting it out directly.
+        if ($params !== false && $method == 'POST') {
+            curl_setopt($ch, CURLOPT_POST, 1); // TRUE to do a regular HTTP POST.
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params); // The full data to post in a HTTP "POST" operation.
+
+            # SSL parameters
+            if (substr($url, 0, 5) === 'https') {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+                //curl_setopt($ch, CURLOPT_CAINFO, Yii::$app->params['CA.certificatePath']);
+            }
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
+        $response = json_decode(curl_exec($ch), true);
+
+        curl_close($ch);
+
+        return $response;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Logs out the current user.

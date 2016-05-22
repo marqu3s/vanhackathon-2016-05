@@ -7,8 +7,10 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use frontend\assets\AppAsset;
+use frontend\assets\animateCssAssetBundle\AnimateCssAssetBundle;
 
 AppAsset::register($this);
+AnimateCssAssetBundle::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

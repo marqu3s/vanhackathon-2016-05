@@ -11,71 +11,26 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-
-$this->title = 'Chat';
-
-$js = <<<JS
-$('#chat-form').submit(function() {
-
-     var form = $(this);
-
-     $.ajax({
-          url: form.attr('action'),
-          type: 'post',
-          data: form.serialize(),
-          success: function (response) {
-               $("#message-field").val("");
-          }
-     });
-
-     return false;
-});
-JS;
-$this->registerJs($js, \yii\web\View::POS_READY)
 ?>
-<div class="site-index">
+<div id="divLogin" class="row hidden">
+    <div class="well col-md-6 col-lg-8 col-md-offset-3 col-lg-offset-2">
 
-    <div class="body-content">
+        <?= Html::beginForm(['/site/login'], 'POST', ['id' => 'login-form']) ?>
 
-        <div class="row">
-            <div class="well col-lg-8 col-lg-offset-2">
-
-                <?= Html::beginForm(['/site/index'], 'POST', [
-                    'id' => 'chat-form'
-                ]) ?>
-
-                <div class="row">
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <?= Html::textInput('name', null, [
-                                'class' => 'form-control',
-                                'placeholder' => 'Name'
-                            ]) ?>
-                        </div>
-                    </div>
-                    <div class="col-xs-7">
-                        <div class="form-group">
-                            <?= Html::textInput('message', null, [
-                                'id' => 'message-field',
-                                'class' => 'form-control',
-                                'placeholder' => 'Message'
-                            ]) ?>
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="form-group">
-                            <?= Html::submitButton('Send', [
-                                'class' => 'btn btn-block btn-success'
-                            ]) ?>
-                        </div>
-                    </div>
-                </div>
-
-                <?= Html::endForm() ?>
-
-                <div id="notifications" ></div>
-            </div>
+        <div class="form-group">
+            <?= Html::textInput('name', 'bot', ['class' => 'form-control', 'placeholder' => 'Name']) ?>
         </div>
+
+        <div class="form-group">
+            <?= Html::textInput('email', 'bot@bot.io', ['class' => 'form-control', 'placeholder' => 'Email']) ?>
+        </div>
+
+        <div class="form-group">
+            <?= Html::submitButton('Send', ['class' => 'btn btn-block btn-success']) ?>
+        </div>
+
+        <?= Html::endForm() ?>
 
     </div>
 </div>
+
