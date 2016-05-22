@@ -36,6 +36,17 @@ use yii\web\View;
  */
 class SiteController extends Controller
 {
+    public $colorMap = [
+        'R' => '#E05656',
+        'G' => '#8CDC92',
+        'B' => '#547CF3',
+        'Y' => '#F7FB6A',
+        'O' => '#F9BC5C',
+        'P' => '#A460DA',
+        'C' => '#93F5F1',
+        'M' => '#F67EF7',
+    ];
+
     /**
      * @inheritdoc
      */
@@ -249,7 +260,10 @@ class SiteController extends Controller
         return $this->renderPartial('_gamesRoom', ['response' => $response]);
     }
 
-    
+    /**
+     * Updates the game board on browser.
+     * @return string
+     */
     public function actionAjaxGetGameBoard()
     {
         $idGame = Yii::$app->request->post('idGame');
@@ -257,12 +271,42 @@ class SiteController extends Controller
 
         $response = $this->requestApi('v1/match/start', 'POST', ['id' => $idGame]);
 
-
         if (isset($response['message'])) {
             $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
         }
 
-        return $this->renderAjax('_gameBoard', ['game' => $response, 'player' => $player]);
+        return $this->renderAjax('_gameBoard', [
+            'game' => $response,
+            'player' => $player,
+            'colorMap' => $this->colorMap
+        ]);
+    }
+
+    /**
+     * Submits a player guess to the API.
+     */
+    public function actionAjaxSubmitGuess()
+    {
+        $idGame = Yii::$app->request->post('idGame');
+        //$idPlayer = Yii::$app->request->post('idPlayer');
+        $guess = Yii::$app->request->post('guess');
+
+        # Get the color codes (letters)
+        $flippedColorMap = array_flip($this->colorMap);
+        $colorCode = [];
+        foreach ($guess as $color) {
+            $colorCode[] = $flippedColorMap[$color];
+        }
+        $guess = implode(',', $colorCode);
+
+        $response = $this->requestApi('v1/match/guess', 'POST', [
+            'id' => $idGame,
+            'guess' => $guess
+        ]);
+
+        Yii::$app->response->format = 'json';
+
+        return $response;
     }
 
 
@@ -337,136 +381,4 @@ class SiteController extends Controller
         return $response;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Logs out the current user.
-     *
-     * @return mixed
-     */
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
-    }
-
-    /**
-     * Displays contact page.
-     *
-     * @return mixed
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending email.');
-            }
-
-            return $this->refresh();
-        } else {
-            return $this->render('contact', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return mixed
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
-
-    /**
-     * Signs user up.
-     *
-     * @return mixed
-     */
-    public function actionSignup()
-    {
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post())) {
-            if ($user = $model->signup()) {
-                if (Yii::$app->getUser()->login($user)) {
-                    return $this->goHome();
-                }
-            }
-        }
-
-        return $this->render('signup', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Requests password reset.
-     *
-     * @return mixed
-     */
-    public function actionRequestPasswordReset()
-    {
-        $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
-                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-
-                return $this->goHome();
-            } else {
-                Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for email provided.');
-            }
-        }
-
-        return $this->render('requestPasswordResetToken', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Resets password.
-     *
-     * @param string $token
-     * @return mixed
-     * @throws BadRequestHttpException
-     */
-    public function actionResetPassword($token)
-    {
-        try {
-            $model = new ResetPasswordForm($token);
-        } catch (InvalidParamException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
-            Yii::$app->session->setFlash('success', 'New password was saved.');
-
-            return $this->goHome();
-        }
-
-        return $this->render('resetPassword', [
-            'model' => $model,
-        ]);
-    }
 }

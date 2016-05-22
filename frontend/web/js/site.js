@@ -95,6 +95,22 @@ function setPlayerStatus(idGame, idPlayer, status) {
     });
 }
 
+function submitGuess(idGame, idPlayer) {
+    var guess = [];
+    $('.color-picker').each(function(i, c) {
+        guess.push($(c).val());
+    });
+
+    $.ajax({
+        type: 'post',
+        url: '/site/ajax-submit-guess',
+        data: {idGame: idGame, idPlayer: idPlayer, guess: guess},
+        complete: function (result) {
+            updateGameRoom(idGame);
+        }
+    });
+}
+
 $(document).ready(function () {
 
     // If there is no token set, show the login window.
@@ -112,19 +128,24 @@ $(document).ready(function () {
     $('#btnJoinGame').click(function() {
         joinExistingGame();
     });
-    $('#divGamesList')
-        .on('click', '.btn-join-game', function() {
+    $('#divGamesList').on('click', '.btn-join-game', function() {
             var id = $(this).data('id');
             joinThisGame(id);
         });
 
     // Player ready!
-    $('#divGameRoom')
-        .on('click', '.btn-player-ready', function() {
-            var idGame = $(this).data('idgame');
-            var idPlayer = $(this).data('idplayer');
-            setPlayerStatus(idGame, idPlayer, 'ready');
-        });
+    $('#divGameRoom').on('click', '.btn-player-ready', function() {
+        var idGame = $(this).data('idgame');
+        var idPlayer = $(this).data('idplayer');
+        setPlayerStatus(idGame, idPlayer, 'ready');
+    });
+    
+    // Submit guess
+    $('#divGameBoard').on('click', '#btnSubmitGuess', function () {
+        var idGame = $(this).data('idgame');
+        var idPlayer = $(this).data('idplayer');
+        submitGuess(idGame, idPlayer);
+    });
 
     // Login form submission via ajax
     $('#login-form').submit(function() {

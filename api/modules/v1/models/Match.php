@@ -172,8 +172,9 @@ class Match extends ActiveRecord
             $this->game->code = "Shhh! It's a secret!";
         }
 
-        # Increment the number of player guesses in this match.
+        # Increment the number of player guesses in this match and status.
         $this->num_guesses++;
+        $this->player_status = 'waitting others';
         $this->save();
 
         # Save player guess, creating a history of guesses.
