@@ -252,6 +252,13 @@ UPDATE NEAR SUBMIT HOUR: I did not finished this challenge. I had a hard time wi
 It was a great experience anyway. I did a lot of resarch on this during the Hackathon and loose a precious time.
 But I think the API is in pretty good shape and is very complete.
 
+If you want to take a look anyway, You will need:
+
+* nodejs to run nodejs/server.js
+* Nodejs dependencies: express, sockets.io and redis.
+* a redis server
+* configure these following the instructions in frontend/controllers/SiteController.php
+
 See you on the next Hackathon!
 
 Cheers!
