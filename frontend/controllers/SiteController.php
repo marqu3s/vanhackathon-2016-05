@@ -198,20 +198,21 @@ class SiteController extends Controller
     }
 
     /**
-     * Join a games
+     * Join a game
      * @return string
      */
     public function actionAjaxJoinGame()
     {
         $response = $this->requestApi('v1/game/join', 'POST', ['id' => Yii::$app->request->post('idGame')]);
-        //if (isset($response['message'])) {
-            # The player is already in this match.
-            //$response = $this->requestApi('v1/game', 'GET', ['id' => Yii::$app->request->post('id')]);
-            //\yii\helpers\VarDumper::dump($response,10,true); die;
-        //}
 
-        //return $this->renderPartial('_gamesRoom', ['response' => $response]);
+        # Let other players know.
+        Yii::$app->redis->executeCommand('PUBLISH', [
+            'channel' => 'notification',
+            'message' => Json::encode(['task' => 'update-room', 'idGame' => Yii::$app->request->post('idGame')])
+        ]);
+
         Yii::$app->response->format = 'json';
+
         return $response;
     }
 
@@ -242,6 +243,12 @@ class SiteController extends Controller
                 'channel' => 'notification',
                 'message' => Json::encode(['task' => 'startgame', 'idGame' => Yii::$app->request->post('idGame')])
             ]);
+        } else {
+            # Let other players know.
+            Yii::$app->redis->executeCommand('PUBLISH', [
+                'channel' => 'notification',
+                'message' => Json::encode(['task' => 'update-room', 'idGame' => Yii::$app->request->post('idGame')])
+            ]);
         }
 
         Yii::$app->response->format = 'json';
@@ -269,11 +276,8 @@ class SiteController extends Controller
         $idGame = Yii::$app->request->post('idGame');
         $player = $this->requestApi('v1/players/get-player');
 
-        $response = $this->requestApi('v1/match/start', 'POST', ['id' => $idGame]);
-
-        if (isset($response['message'])) {
-            $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
-        }
+        $this->requestApi('v1/match/start', 'POST', ['id' => $idGame]);
+        $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
 
         return $this->renderAjax('_gameBoard', [
             'game' => $response,
@@ -308,6 +312,7 @@ class SiteController extends Controller
         # Get current game data
         $response = $this->requestApi('v1/game', 'GET', ['id' => $idGame]);
 
+
         # Check if all Players are waitting others. This means they all played.
         $allPlayersReady = true;
         foreach ($response['matches'] as $player) {
@@ -323,13 +328,13 @@ class SiteController extends Controller
                 'channel' => 'notification',
                 'message' => Json::encode(['task' => 'all-players-ready', 'idGame' => Yii::$app->request->post('idGame')])
             ]);
+        } else {
+            # Just Update game room
+            Yii::$app->redis->executeCommand('PUBLISH', [
+                'channel' => 'notification',
+                'message' => Json::encode(['task' => 'update-board', 'idGame' => Yii::$app->request->post('idGame')])
+            ]);
         }
-
-        # Update game room
-        Yii::$app->redis->executeCommand('PUBLISH', [
-            'channel' => 'notification',
-            'message' => Json::encode(['task' => 'update-room', 'idGame' => Yii::$app->request->post('idGame')])
-        ]);
 
         Yii::$app->response->format = 'json';
 

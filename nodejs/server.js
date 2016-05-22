@@ -24,17 +24,22 @@ io.on('connection', function (socket) {
 
     redisClient.on("message", function(channel, message) {
         console.log("New message: " + message + ". In channel: " + channel);
-        // socket.emit(channel, message);
         var messageJson = JSON.parse(message);
-        console.log(messageJson);
+        // console.log(messageJson);
 
-        if (messageJson.task === 'startgame') {
+        socket.emit('game' + messageJson.idGame, message);
+        /*if (messageJson.task === 'startgame') {
             socket.emit('game' + messageJson.idGame, message);
         } else if (messageJson.task === 'update-room') {
             socket.emit('game' + messageJson.idGame, message);
+        } else if (messageJson.task === 'update-board') {
+            socket.emit('game' + messageJson.idGame, message);
+        } else if (messageJson.task === 'player-joinned-game') {
+            socket.emit('game' + messageJson.idGame, message);
         } else if (messageJson.task === 'all-players-ready') {
             socket.emit('game' + messageJson.idGame, message);
-        }
+        }*/
+
     });
 
     socket.on('disconnect', function() {

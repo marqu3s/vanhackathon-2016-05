@@ -13,35 +13,6 @@ function checkPlayer() {
     }
 }
 
-function subscribePlayer(id) {
-    // Join player on the game room
-    socket.emit('subscribe', 'game' + id);
-    socket.on('game' + id, function (data) {
-        var message;
-        try {
-            message = JSON.parse(data);
-        } catch (e) {
-            message = data;
-        }
-        console.log(message);
-        if (message.task == 'startgame') {
-            startGame(message.idGame);
-        } else if (message.task == 'update-room') {
-            updateGameRoom(message.idGame);
-        } else if (message.task == 'all-players-ready') {
-            updateGameRoom(message.idGame);
-            updateGameBoard(message.idGame);
-        }
-    });
-    console.log('Player subscribed to channel: game' + id);
-}
-
-function startGame(id) {
-    console.log('Starting game ' + id);
-    $('#divGameRoom').addClass('hidden').removeClass('animated slideInLeft');
-    updateGameBoard(id);
-}
-
 function updateGameRoom(id) {
     $('#divGameRoom').load('/site/ajax-update-game-room', {id: id}, function() {
         $('#divGamesList').removeClass('animated slideInLeft fadeIn').addClass('hidden');
@@ -54,6 +25,40 @@ function updateGameBoard(id) {
     $('#divGameBoard').load('/site/ajax-get-game-board', {idGame: id}, function() {
         $(this).removeClass('hidden').addClass('animated fadeIn');
     });
+}
+
+function startGame(id) {
+    console.log('Starting game ' + id);
+    $('#divGameRoom').addClass('hidden').removeClass('animated slideInLeft');
+    updateGameBoard(id);
+}
+
+function subscribePlayer(id) {
+    // Join player on the game room
+    socket.emit('subscribe', 'game' + id);
+    socket.on('game' + id, function (data) {
+        var message;
+        try {
+            message = JSON.parse(data);
+        } catch (e) {
+            message = data;
+        }
+        console.log(message);
+        if (message.task === 'startgame') {
+            startGame(message.idGame);
+        } else if (message.task === 'update-room') {
+            updateGameRoom(message.idGame);
+        } else if (message.task === 'update-board') {
+            updateGameBoard(message.idGame);
+        } else if (message.task === 'all-players-ready') {
+            updateGameBoard(message.idGame);
+            $('#btnSubmitGuess').show();
+            $('#btnSubmitGuessMsg').hide();
+        } else if (message.task === 'player-joinned-game') {
+            updateGameRoom(message.idGame);
+        }
+    });
+    console.log('Player subscribed to channel: game' + id);
 }
 
 function createNewGame() {
@@ -84,13 +89,13 @@ function joinThisGame(id) {
 
     $.post('/site/ajax-join-game', {idGame: id}, function (result) {
         // Update the game room table
-        updateGameRoom(id);
+        // updateGameRoom(id);
 
         // Let other players know
-        socket.emit('player-joinned-game', id);
+        // socket.emit('player-joinned-game', id);
     });
 
-    console.log('Player ' + token + ' joinned game ' + id);
+    // console.log('Player ' + token + ' joinned game ' + id);
 }
 
 function setPlayerStatus(idGame, idPlayer, status) {
@@ -108,16 +113,22 @@ function setPlayerStatus(idGame, idPlayer, status) {
 function submitGuess(idGame, idPlayer) {
     var guess = [];
     $('.color-picker').each(function(i, c) {
-        guess.push($(c).val());
+        if ($(c).val() !== '') {
+            guess.push($(c).val());
+        }
     });
+
+    if (guess.length === 0) {
+        alert('Choose the colors and their positions first.'); //   <--- I know, super ugly... outta time.
+        return;
+    }
 
     $.ajax({
         type: 'post',
         url: '/site/ajax-submit-guess',
         data: {idGame: idGame, idPlayer: idPlayer, guess: guess},
         complete: function (result) {
-            updateGameRoom(idGame);
-            updateGameBoard(idGame);
+            // updateGameBoard(idGame);
             $('#btnSubmitGuess').hide();
             $('#btnSubmitGuessMsg').show();
         }

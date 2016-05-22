@@ -32,7 +32,7 @@
                             <?php// if ($response['matches'][$i]['player_status'] != 'ready'): ?>
                                 <button class="btn btn-success btn-xs btn-player-ready" data-idgame="<?= $response['id'] ?>" data-idplayer="<?= $player['id'] ?>">Ready!</button>
                             <?php //else: ?>
-                                <button class="btn btn-success btn-xs btn-player-leave" data-idgame="<?= $response['id'] ?>" data-idplayer="<?= $player['id'] ?>">Leave</button>
+                                <!--<button class="btn btn-success btn-xs btn-player-leave" data-idgame="--><?php //= $response['id'] ?><!--" data-idplayer="--><?php//= $player['id'] ?><!--">Leave</button>-->
                             <?php //endif; ?>
                         <?php endif; ?>
                     </td>
